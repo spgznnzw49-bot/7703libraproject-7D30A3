@@ -1,0 +1,2413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生日快乐！专属旅行礼物</title>
+    <!-- 使用预编译的 Tailwind CSS -->
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e6d9ff, #d9bfff);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            min-height: 100vh;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            background: linear-gradient(135deg, #e6d9ff, #d9bfff);
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .active {
+            display: flex !important;
+            z-index: 2;
+            opacity: 1;
+        }
+        
+        /* 生日祝福样式 */
+        .birthday-message {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .birthday-message h1 {
+            font-size: 4.5rem;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 1.5rem;
+            animation: float 3s ease-in-out infinite;
+            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .birthday-message h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #000;
+            animation: float 3s ease-in-out infinite;
+            animation-delay: 0.5s;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* 装饰元素 */
+        .decoration {
+            position: absolute;
+            z-index: -1;
+            opacity: 0.7;
+            font-size: 2rem;
+        }
+        
+        .heart { color: #ec4899; animation: float 5s ease-in-out infinite; }
+        .star { color: #facc15; animation: float 6s ease-in-out infinite; }
+        .balloon { color: #c084fc; animation: float 7s ease-in-out infinite; }
+        
+        /* 礼物盒样式 */
+        .gift-container {
+            position: relative;
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .gift-box {
+            position: relative;
+            width: 280px;
+            height: 200px;
+            background: linear-gradient(135deg, #c084fc, #9333ea);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .gift-box::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(135deg, #a855f7, #7e22ce);
+            top: 0;
+            left: 0;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .gift-lid {
+            position: absolute;
+            width: 300px;
+            height: 40px;
+            background: linear-gradient(135deg, #a855f7, #7e22ce);
+            border-radius: 12px 12px 0 0;
+            top: -40px;
+            left: -10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform-origin: bottom;
+            transition: transform 1s ease;
+        }
+        
+        .ribbon {
+            position: absolute;
+            width: 50px;
+            height: 100%;
+            background: #facc15;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .ribbon::before, .ribbon::after {
+            content: '';
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background: #facc15;
+            border-radius: 50%;
+            top: -35px;
+        }
+        
+        .ribbon::before { left: -35px; }
+        .ribbon::after { right: -35px; }
+        
+        .ribbon-knot {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #facc15;
+            border-radius: 50%;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .gift-text {
+            margin-top: 2rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #7e22ce;
+            text-align: center;
+        }
+        
+        /* 光芒效果 */
+        .light-effect {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+            opacity: 0;
+            transition: opacity 1s ease;
+            pointer-events: none;
+        }
+        
+        /* 季节选择样式 */
+        .season-selection {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .season-option {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .season-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .season-emoji {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .season-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #7e22ce;
+        }
+        
+        /* 信封样式 */
+        .envelope-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .envelope-container.visible {
+            opacity: 1;
+        }
+        
+        .envelope {
+            width: 120px;
+            height: 80px;
+            background: #f8f4e5;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .envelope:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .envelope:active {
+            transform: scale(0.95);
+        }
+        
+        .envelope:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #f8f4e5, #e8e4d5);
+            z-index: 1;
+        }
+        
+        .envelope:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='80' viewBox='0 0 120 80'%3E%3Cpath d='M0,0 L60,40 L120,0 L120,80 L0,80 Z' fill='%23f8f4e5'/%3E%3C/svg%3E");
+            z-index: 2;
+        }
+        
+        .envelope-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #7e22ce;
+            z-index: 3;
+        }
+        
+        /* 新转盘样式 - 使用图片 (替换 .wheel-container 和 .wheel) */
+        #wheel_image {
+        /* ********************************************* */
+        /* **此处修改轮盘大小：** */
+            width: 65%; /* 调整为合适的大小 */
+            aspect-ratio: 1 / 1; /* 保持宽高比相等，确保是正圆形 */
+            height: auto; /* 确保高度自适应 */
+    /* ********************************************* */
+            margin: 0 auto; /* 居中 */
+    
+            /* 轮盘内容：使用背景图片 */
+            background-image: url('wheel_image.svg'); /* **重要：请替换为你的转盘图片路径** */
+            background-size: cover; /* 确保图片覆盖整个元素 */
+            background-position: center;
+            border-radius: 50%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0);
+            transition: transform 3s cubic-bezier(0.2, 0.8, 0.3, 1);
+        }
+        
+        /* 轮盘包装器 - 用于定位固定指针 */
+        .wheel-wrapper {
+            position: relative;
+            width: 65%; /* 与轮盘相同宽度 */
+            margin: 0 auto;
+            height: auto; /* 确保高度自适应 */
+        }
+        
+        /* 黑色指针 - 固定版本（翻转180°） */
+        .wheel-pointer {
+            position: absolute;
+            top: 0; /* 调整位置使其在轮盘上方 */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 40px solid black;
+            z-index: 10; /* 确保指针在轮盘上方 */
+            pointer-events: none;
+        }
+        
+        .spin-button {
+            margin-top: 2rem;
+            background: linear-gradient(135deg, #c084fc, #9333ea);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .spin-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .spin-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .bottom-button-container {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+        }
+        
+        .bottom-button-container .spin-button {
+            margin-top: 0;
+            min-width: 200px;
+        }
+        
+        /* 卡片样式 */
+        .memory-cards {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+        }
+        
+        .travel-card {
+            width: 200px;
+            height: 250px;
+            perspective: 1000px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .travel-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+        
+        .travel-card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-front {
+            background: linear-gradient(135deg, #c084fc, #9333ea);
+            color: white;
+        }
+        
+        .card-back {
+            background: white;
+            transform: rotateY(180deg);
+            border: 2px solid #c084fc;
+        }
+        
+        .card-back button {
+            background: #7e22ce;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        
+        .card-back button:hover {
+            background: #6b21a8;
+        }
+        
+        /* 旅行攻略样式 */
+        .travel-itinerary {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .travel-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .travel-header h2 {
+            font-size: 2.5rem;
+            color: #7e22ce;
+            margin-bottom: 1rem;
+        }
+        
+        .travel-header p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .back-button, .final-button {
+            background: #7e22ce;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 2rem;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .back-button:hover, .final-button:hover {
+            background: #6b21a8;
+        }
+        
+        .overview {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            gap: 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eaeaea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card h3 i {
+            color: #4a6491;
+        }
+        
+        .itinerary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .day-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s;
+        }
+        
+        .day-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .day-header {
+            background: linear-gradient(120deg, #4a6491, #5d7cb0);
+            color: white;
+            padding: 15px 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .day-content {
+            padding: 20px;
+        }
+        
+        .time-slot {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #eaeaea;
+        }
+        
+        .time-slot:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .time {
+            font-weight: 600;
+            color: #4a6491;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .activity {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .activity:last-child {
+            margin-bottom: 0;
+        }
+        
+        .activity i {
+            color: #5d7cb0;
+            margin-top: 3px;
+        }
+        
+        .food-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 40px;
+        }
+        
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .food-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: background 0.3s;
+        }
+        
+        .food-item:hover {
+            background: #e9ecef;
+        }
+        
+        .food-icon {
+            width: 50px;
+            height: 50px;
+            background: #4a6491;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .pending { color: #6c757d; }
+        .highlight { color: #e74c3c; font-weight: 600; }
+        .emoji { font-size: 1.2rem; margin-right: 5px; }
+        .section-title {
+            text-align: center;
+            margin: 40px 0 20px;
+            color: #2c3e50;
+            font-size: 1.8rem;
+        }
+        
+        .rating {
+            display: inline-block;
+            background: #facc15;
+            color: #7c2d12;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        
+        .food-rating {
+            margin-top: 8px;
+        }
+        
+        .food-rating i {
+            color: #facc15;
+            margin-right: 2px;
+            font-size: 0.9rem;
+        }
+        
+        .food-rating .fa-star-o {
+            color: #d1d5db;
+        }
+        
+        .small-text {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .transport-info {
+            background: #f0f7ff;
+            border-left: 4px solid #4a6491;
+            padding: 10px 15px;
+            margin: 8px 0;
+            border-radius: 4px;
+        }
+
+        /* 动画定义 */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        @keyframes pull-ribbon {
+            0% { transform: translateX(-50%) scaleY(1); }
+            100% { transform: translateX(-50%) scaleY(1.5); }
+        }
+        
+        @keyframes remove-ribbon {
+            0% { transform: translateX(-50%) translateY(0) scaleY(1.5); opacity: 1; }
+            100% { transform: translateX(-50%) translateY(-100px) scaleY(1.5); opacity: 0; }
+        }
+        
+        @keyframes open-lid {
+            0% { transform: rotateX(0); }
+            100% { transform: rotateX(-120deg); }
+        }
+        
+        @keyframes envelope-appear {
+            0% { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #c084fc, #9333ea);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* 只有河南剧场指南样式 */
+        .theater-guide {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .theater-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #eaeaea;
+        }
+        
+        .theater-section:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .theater-section h4 {
+            font-size: 1.2rem;
+            color: #4a6491;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+        
+        .theater-section h4 i {
+            color: #7e22ce;
+        }
+        
+        .theater-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .theater-list li {
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+            line-height: 1.4;
+            color: #333;
+        }
+        
+        .theater-list li:before {
+            content: "•";
+            color: #7e22ce;
+            font-weight: bold;
+            position: absolute;
+            left: 8px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loader {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #7e22ce;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 加载遮罩 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loader"></div>
+    </div>
+
+    <!-- 第一页：生日祝福 -->
+    <div id="page1" class="page active">
+        <div class="container">
+            <div class="decoration heart" style="top: 10%; left: 5%;">❤️</div>
+            <div class="decoration star" style="top: 15%; right: 10%;">⭐</div>
+            <div class="decoration balloon" style="bottom: 20%; left: 15%;">🎈</div>
+            <div class="decoration heart" style="bottom: 25%; right: 20%;">💖</div>
+            <div class="decoration star" style="top: 40%; left: 25%;">✨</div>
+            <div class="decoration balloon" style="bottom: 45%; right: 5%;">🎐</div>
+            
+            <div class="birthday-message">
+                <h1>生日快乐！</h1>
+                <h2>Happy Birthday!</h2>
+            </div>
+            
+            <div class="gift-container">
+                <div class="gift-box">
+                    <div class="light-effect" id="lightEffect"></div>
+                    <div class="gift-lid" id="giftLid"></div>
+                    <div class="ribbon" id="ribbon">
+                        <div class="ribbon-knot"></div>
+                    </div>
+                    <div class="gift-text">长按丝带拆开礼物</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 第二页：季节选择 -->
+    <div id="page2" class="page">
+        <div class="container">
+            <h2 class="text-3xl font-bold text-center mb-4">选择你认为最合适旅游的季节</h2>
+            <p class="text-lg text-center text-gray-700 mb-8">点击你喜欢的季节，发现专属旅行地</p>
+            
+            <div class="season-selection">
+                <div class="season-option" data-season="spring">
+                    <div class="season-emoji">🌸</div>
+                    <div class="season-name">春天</div>
+                </div>
+                <div class="season-option" data-season="summer">
+                    <div class="season-emoji">☀️</div>
+                    <div class="season-name">夏天</div>
+                </div>
+                <div class="season-option" data-season="autumn">
+                    <div class="season-emoji">🍂</div>
+                    <div class="season-name">秋天</div>
+                </div>
+                <div class="season-option" data-season="winter">
+                    <div class="season-emoji">❄️</div>
+                    <div class="season-name">冬天</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 第三页：季节攻略 -->
+    <div id="season-itinerary" class="page">
+        <div class="container">
+            <button class="back-button" id="backFromSeason">
+                <i class="fa fa-arrow-left"></i> 返回
+            </button>
+            <div class="travel-itinerary">
+                <div class="travel-header">
+                    <h2>徐州三日游旅行攻略</h2>
+                </div>
+                <div class="overview">
+                    <div class="card">
+                        <h3><i class="fa fa-train"></i> 交通信息</h3>
+                        <p><strong>出发地：</strong>无锡 → 徐州</p>
+                        <p><strong>交通方式：</strong>高铁 (3小时左右)</p>
+                        <p><strong>住宿：</strong>如家精选酒店（徐州淮海路中心店）</p>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fa fa-map-marked-alt"></i> 行程亮点</h3>
+                        <p><strong>美食体验：</strong>烧烤、饣它汤、米线</p>
+                        <p><strong>文化探索：</strong>徐州博物馆、戏马台</p>
+                        <p><strong>自然风光：</strong>云龙山、云龙湖</p>
+                    </div>
+                </div>
+                <h3 class="section-title">行程安排</h3>
+                <div class="itinerary">
+                    <div class="day-card">
+                        <div class="day-header">第一天 - 抵达与美食探索</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-sun-o"></i> 下午</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>富国街：笑笑凉皮 <span class="rating">⭐⭐⭐</span></div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-moon-o"></i> 晚上</div>
+                                <div class="activity">
+                                    <i class="fa fa-utensils"></i>
+                                    <div>烧烤：顶流碳烤 <span class="rating">⭐⭐⭐</span></div>
+                                    <div class="small-text">甜醋汁很独特，三只羊和方方烧烤人太多</div>
+                                    <div class="transport-info">
+                                        <i class="fa fa-subway"></i> 交通：地铁1号线彭城广场转2号线，2号线户部山1号口出，步行至店内
+                                    </div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>饭后消食：戏马台、彭城广场 <span class="rating">⭐⭐⭐</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="day-card">
+                        <div class="day-header">第二天 - 文化与自然</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-sun-o"></i> 上午</div>
+                                <div class="activity">
+                                    <i class="fa fa-utensils"></i>
+                                    <div>饣它汤（饣它道6：00-12：00）😴</div>
+                                    <div class="small-text">(～﹃～)~zZ 起不来</div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>徐州博物馆 <span class="rating">⭐⭐⭐⭐</span></div>
+                                    <div class="transport-info">
+                                        <i class="fa fa-taxi"></i> 交通：打车前往
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-cloud"></i> 中午</div>
+                                <div class="activity">
+                                    <i class="fa fa-utensils"></i>
+                                    <div>云龙湖阿喆米线 <span class="rating">⭐⭐⭐⭐</span></div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-cloud"></i> 下午</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>云龙山（爬山！）<span class="rating">⭐⭐⭐⭐</span></div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>云龙湖（划船！）<span class="rating">⭐⭐⭐⭐</span></div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-moon-o"></i> 晚上</div>
+                                <div class="activity">
+                                    <i class="fa fa-utensils"></i>
+                                    <div>三中高皇羊肉馆 <span class="rating">⭐⭐⭐⭐⭐</span></div>
+                                    <div class="small-text">炒豆芽/羊肉 - 好吃好吃好吃</div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>夜宵：富国街 <span class="rating">⭐⭐</span></div>
+                                    <div class="small-text">(ˉ﹃ˉ)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="day-card">
+                        <div class="day-header">第三天 - 返程与最后美食</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-sun-o"></i> 上午</div>
+                                <div class="activity">
+                                    <i class="fa fa-utensils"></i>
+                                    <div>菜煎饼 😴</div>
+                                    <div class="small-text">起不来</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-cloud"></i> 中午</div>
+                                <div class="activity">
+                                    <i class="fa fa-utensils"></i>
+                                    <div>庆坤东坡把子肉 <span class="rating">⭐⭐⭐⭐⭐</span></div>
+                                    <div class="small-text">每个菜都好吃！</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-cloud"></i> 下午</div>
+                                <div class="activity">
+                                    <i class="fa fa-train"></i>
+                                    <div>返程回无锡</div>
+                                    <div class="small-text">1号线地铁至徐州东站（30分钟）→ 高铁回无锡</div>
+                                    <div class="transport-info">
+                                        <i class="fa fa-subway"></i> 交通：1号线地铁至徐州东站（30分钟）<br>
+                                        <i class="fa fa-train"></i> 高铁：徐州东站 → 无锡站
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+         
+    
+    <!-- 第四页：转盘 -->
+    <div id="page4" class="page">
+        <div class="container">
+            <h2 class="text-3xl font-bold text-center mb-4">转动转盘选择下一个目的地</h2>
+            
+            <div class="wheel-wrapper">
+                <div id="wheel_image"></div>
+                <div class="wheel-pointer"></div>
+            </div>
+            
+        </div>
+        
+        <!-- 页面下方中间的转动按钮 -->
+        <div class="bottom-button-container">
+            <button class="spin-button" id="spinButton">转动转盘</button>
+        </div>
+    </div>
+    
+    <!-- 第五页：转盘攻略 -->
+    <div id="wheel-itinerary" class="page">
+        <div class="container">
+            <button class="back-button" id="backFromWheel">
+                <i class="fa fa-arrow-left"></i> 返回
+            </button>
+            <div class="travel-itinerary">
+                <div class="travel-header">
+                    <h2>河南九日游旅行攻略</h2>
+                </div>
+                
+                <div class="overview">
+                    <div class="card">
+                        <h3><i class="fa fa-train"></i> 行程概览</h3>
+                        <p><strong>天数：</strong>9天8晚</p>
+                        <p><strong>路线：</strong>郑州 → 洛阳 → 开封</p>
+                        <p><strong>特色：</strong>历史文化、自然风光、美食体验</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h3><i class="fa fa-map-marked-alt"></i> 行程亮点</h3>
+                        <p><strong>郑州：</strong>只有河南剧场、河南博物院</p>
+                        <p><strong>洛阳：</strong>老君山、龙门石窟、博物馆</p>
+                        <p><strong>开封：</strong>清明上河园、夜市美食</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h3><i class="fa fa-utensils"></i> 美食推荐</h3>
+                        <p><strong>郑州：</strong>眷之茶、卷凉皮</p>
+                        <p><strong>洛阳：</strong>天府火锅、小街天府</p>
+                        <p><strong>开封：</strong>胡辣汤、夜市小吃</p>
+                    </div>
+                </div>
+
+                <h3 class="section-title">行程安排</h3>
+                
+                <!-- 郑州部分 -->
+                <div class="city-section">
+                    <h2>第一站：郑州</h2>
+                </div>
+                <div class="itinerary">
+                    <div class="day-card">
+                        <div class="day-header">Day 0 - 抵达郑州（方案1：夜班火车）</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-moon-o"></i> 夜间</div>
+                                <div class="activity">
+                                    <i class="fa fa-train"></i>
+                                    <div>无锡站 → 郑州站</div>
+                                    <div class="small-text">高铁22:14-8:55（10小时41分钟）</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-sun-o"></i> 抵达后</div>
+                                <div class="activity">
+                                    <i class="fa fa-taxi"></i>
+                                    <div>郑州站打车至酒店</div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-hotel"></i>
+                                    <div>酒店：星程酒店（二七广场店）</div>
+                                    <div class="small-text">不太推荐</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="itinerary">
+                    <div class="day-card">
+                        <div class="day-header">Day 0 - 抵达郑州（方案2：白天高铁）</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-sun-o"></i> 白天</div>
+                                <div class="activity">
+                                    <i class="fa fa-train"></i>
+                                    <div>无锡 → 郑州东站</div>
+                                    <div class="small-text">高铁5小时10分钟</div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-hotel"></i>
+                                    <div>酒店：郑州东站附近</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="itinerary">
+                    <div class="day-card">
+                        <div class="day-header">Day 1 - 只有河南剧场</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-sun-o"></i> 上午</div>
+                                <div class="activity">
+                                    <i class="fa fa-subway"></i>
+                                    <div>前往只有河南剧场</div>
+                                    <div class="transport-info">
+                                        交通：星程酒店 → 郑州东站（地铁1号线）→ 绿博园（城际列车7r）→ 只有河南（打车）
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-cloud"></i> 全天</div>
+                                <div class="activity">
+                                    <i class="fa fa-theater-masks"></i>
+                                    <div>只有河南剧场 <span class="rating">⭐⭐⭐⭐</span></div>
+                                    <div class="small-text">学生票200r，预计游览时间10:00-20:00</div>
+                                </div>
+                            </div>
+                            
+                            <div class="theater-guide">
+                                <div class="theater-section">
+                                    <h4><i class="fa fa-film"></i> 主剧场</h4>
+                                    <ul class="theater-list">
+                                        <li>火车站剧场：睡着咧(●ˇ∀ˇ●)</li>
+                                        <li>李家村剧场：没去</li>
+                                        <li>幻城剧场：场面很宏大，能感受到河南的历史文化底蕴</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="theater-section">
+                                    <h4><i class="fa fa-video-camera"></i> 室内小剧场</h4>
+                                    <ul class="theater-list">
+                                        <li>候车大厅：睡着了</li>
+                                        <li>天子架六遗址坑：还行</li>
+                                        <li>第七机车车辆厂礼堂：还行</li>
+                                        <li>唱吧跳吧：极力推荐！（bushi）迪厅蹦迪，对耳朵不太友好</li>
+                                        <li>老院子：无聊</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="theater-section">
+                                    <h4><i class="fa fa-tree"></i> 室外剧场</h4>
+                                    <ul class="theater-list">
+                                        <li>张家大院：无聊</li>
+                                        <li>李铭旦书场：无聊</li>
+                                        <li>乾台：没啥印象了</li>
+                                        <li>坤台：没啥印象了</li>
+                                        <li>文明之光：还行</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-utensils"></i> 餐饮</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>麦浪餐厅、地坑院 <span class="rating">⭐⭐⭐⭐⭐</span></div>
+                                    <div class="small-text">卷凉皮、麻酱毛肚、眷之茶（荆芥柠檬茶）</div>
+                                </div>
+                            </div>
+                            
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-moon-o"></i> 晚上</div>
+                                <div class="activity">
+                                    <i class="fa fa-train"></i>
+                                    <div>返回：绿博园-郑州东站（7r，21:02-21:15）-星程二七广场店</div>
+                                    <div class="small-text">打车20r30min/1号线地铁二七广场站40min</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="day-card">
+                        <div class="day-header">Day 2 - 河南博物院 → 洛阳</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-sun-o"></i> 上午</div>
+                                <div class="activity">
+                                    <i class="fa fa-museum"></i>
+                                    <div>河南博物院 <span class="rating">⭐⭐⭐⭐</span></div>
+                                    <div class="small-text">需提前预约，游玩时间2-3小时</div>
+                                    <div class="transport-info">
+                                        交通：共享电动/打车20分钟
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-train"></i> 下午</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>郑州站 → 龙门站</div>
+                                    <div class="small-text">高铁13:52-14:38</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-moon-o"></i> 晚上</div>
+                                <div class="activity">
+                                    <i class="fa fa-utensils"></i>
+                                    <div>洛阳天府火锅 <span class="rating">⭐⭐⭐⭐</span></div>
+                                    <div class="small-text">桌上放玫瑰花的火锅店(○´･д･)ﾉ但是还不错</div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>应天门、天堂明堂、丽景门</div>
+                                    <div class="small-text">应天门29r、天堂明堂45r、丽景门25r</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 洛阳部分 -->
+                <div class="city-section">
+                    <h2>第二站：洛阳</h2>
+                </div>
+                
+                <div class="itinerary">
+                    <div class="day-card">
+                        <div class="day-header">Day 3 - 老君山</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-sun-o"></i> 全天</div>
+                                <div class="activity">
+                                    <i class="fa fa-mountain"></i>
+                                    <div>老君山一日游 <span class="rating">⭐⭐⭐⭐⭐</span></div>
+                                    <div class="small-text">携程跟团游375r（全程两索道）</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="day-card">
+                        <div class="day-header">Day 4 - 龙门石窟</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-sun-o"></i> 全天</div>
+                                <div class="activity">
+                                    <i class="fa fa-monument"></i>
+                                    <div>龙门石窟 <span class="rating">⭐⭐⭐⭐⭐</span></div>
+                                    <div class="transport-info">
+                                        交通：公交换乘（1h32min）：民族路团结口公交站76路—龙门大道太康路口，换乘60/53/81路—龙门石窟，步行900米
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-moon-o"></i> 晚上</div>
+                                <div class="activity">
+                                    <i class="fa fa-utensils"></i>
+                                    <div>吕记炒鸡 <span class="rating">⭐⭐⭐</span></div>
+                                    <div class="small-text">环境一般，味道甜甜的</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="day-card">
+                        <div class="day-header">Day 5 - 博物馆日</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-sun-o"></i> 上午</div>
+                                <div class="activity">
+                                    <i class="fa fa-museum"></i>
+                                    <div>古墓博物馆 <span class="rating">⭐⭐⭐⭐⭐</span></div>
+                                    <div class="small-text">9:00-16:00</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-cloud"></i> 中午</div>
+                                <div class="activity">
+                                    <i class="fa fa-utensils"></i>
+                                    <div>小街天府 <span class="rating">⭐⭐⭐⭐</span></div>
+                                    <div class="small-text">各地美食大杂烩</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-cloud"></i> 下午</div>
+                                <div class="activity">
+                                    <i class="fa fa-museum"></i>
+                                    <div>洛阳博物馆 <span class="rating">⭐⭐⭐⭐</span></div>
+                                    <div class="small-text">13:00-16:30，需提前预约</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-moon-o"></i> 晚上</div>
+                                <div class="activity">
+                                    <i class="fa fa-utensils"></i>
+                                    <div>和记涮牛肉 <span class="rating">⭐⭐⭐</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="day-card">
+                        <div class="day-header">Day 6 - 白马寺</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-sun-o"></i> 上午</div>
+                                <div class="activity">
+                                    <i class="fa fa-bed"></i>
+                                    <div>休息 😴</div>
+                                    <div class="small-text">起不来</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-cloud"></i> 中午</div>
+                                <div class="activity">
+                                    <i class="fa fa-utensils"></i>
+                                    <div>西工饭庄 → 小街天府</div>
+                                    <div class="small-text">很多河南传统美食，但吃不惯</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-cloud"></i> 下午</div>
+                                <div class="activity">
+                                    <i class="fa fa-place-of-worship"></i>
+                                    <div>白马寺</div>
+                                    <div class="transport-info">
+                                        交通：公交58路
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-moon-o"></i> 晚上</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>周王城广场</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 开封部分 -->
+                <div class="city-section">
+                    <h2>第三站：开封</h2>
+                </div>
+                
+                <div class="itinerary">
+                    <div class="day-card">
+                        <div class="day-header">Day 7 - 抵达开封</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-train"></i> 下午</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>洛阳龙门 → 开封北</div>
+                                    <div class="small-text">高铁14:40-15:41</div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-hotel"></i>
+                                    <div>入住：维也纳国际酒店（清明上河园店）</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-moon-o"></i> 晚上</div>
+                                <div class="activity">
+                                    <i class="fa fa-utensils"></i>
+                                    <div>河大夜市 <span class="rating">⭐⭐⭐⭐</span></div>
+                                    <div class="small-text">杏仁露、牛肉火烧、白吉馍、鸡腿、炸蘑菇</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="day-card">
+                        <div class="day-header">Day 8 - 清明上河园</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-sun-o"></i> 上午</div>
+                                <div class="activity">
+                                    <i class="fa fa-utensils"></i>
+                                    <div>胡辣汤</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-cloud"></i> 下午</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>清明上河园</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-moon-o"></i> 晚上</div>
+                                <div class="activity">
+                                    <i class="fa fa-utensils"></i>
+                                    <div>夜市美食</div>
+                                    <div class="small-text">鼓楼夜市、西司广场夜市、河大夜市</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="day-card">
+                        <div class="day-header">Day 9 - 返程</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-train"></i> 上午</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>开封北 → 无锡东</div>
+                                    <div class="small-text">高铁11:28-16:04</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3><i class="fa fa-ticket-alt"></i> 实用信息</h3>
+                    <p><strong>洛阳景点联票：</strong>99r包括龙门石窟、应天门、天堂明堂、九洲池、牡丹阁等</p>
+                    <p><strong>交通建议：</strong>郑州地铁发达，洛阳建议公交+打车结合，开封景点集中可步行</p>
+                    <p><strong>最佳季节：</strong>春秋季（3-5月，9-11月）气候宜人</p>
+                </div>
+            </div>
+        </div>
+    </div>
+               
+    
+    <!-- 第六页：卡片选择 -->
+    <div id="page6" class="page">
+        <div class="container">
+            <p class="text-3xl font-bold text-center mb-4">选择一张卡片</p>
+            <div class="memory-cards" id="memoryCards"></div>
+        </div>
+    </div>
+    
+    <!-- 第七页：卡片攻略 -->
+    <div id="card-itinerary" class="page">
+        <div class="container">
+            <button class="final-button" id="finalButton">
+                <i class="fa fa-arrow-right"></i> 最后
+            </button>
+            <div class="travel-itinerary">
+                <div class="travel-header">
+                    <h2>广西六日游旅行攻略</h2>
+                </div>
+                <div class="overview">
+                    <div class="card">
+                        <h3><i class="fa fa-plane"></i> 行程概览</h3>
+                        <p><strong>天数：</strong>6天5晚</p>
+                        <p><strong>路线：</strong>南宁 → 柳州 → 桂林</p>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fa fa-map-marked-alt"></i> 行程亮点</h3>
+                        <p><strong>南宁：</strong>青秀山</p>
+                        <p><strong>柳州：</strong>马鞍山公园</p>
+                        <p><strong>桂林：</strong>两江四湖</p>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fa fa-utensils"></i> 美食推荐</h3>
+                        <p><strong>南宁：</strong>柠檬鸭、老友粉</p>
+                        <p><strong>柳州：</strong>螺蛳粉</p>
+                        <p><strong>桂林：</strong>桂林米粉</p>
+                    </div>
+                </div>
+                <h3 class="section-title">行程安排</h3>
+                <div class="itinerary">
+                    <div class="day-card">
+                        <div class="day-header">第一天 - 抵达南宁</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-plane"></i> 下午</div>
+                                <div class="activity">
+                                    <i class="fa fa-plane"></i>
+                                    <div>无锡硕放机场 → 南宁吴圩机场</div>
+                                    <div class="small-text">11:55-14:50</div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-hotel"></i>
+                                    <div>酒店：汉庭酒店（南宁金湖广场店）</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-utensils"></i> 晚餐</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>甘家界柠檬鸭</div>
+                                    <div class="small-text">很奇妙的味道</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-tree"></i> 晚上</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>青秀山 <span class="rating">⭐⭐⭐⭐⭐</span></div>
+                                    <div class="small-text">推荐！晚上可以看到开灯</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-moon-o"></i> 夜宵</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>琅西夜市</div>
+                                    <div class="small-text">大唐卷筒粉、越南卷粉、蜜汁烤排骨、糖水铺、紫苏炸鸭腿、酸野</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="day-card">
+                        <div class="day-header">Day 2 - 南宁探索</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-sun-o"></i> 早午餐</div>
+                                <div class="activity">
+                                    <i class="fa fa-utensils"></i>
+                                    <div>一翻榨生榨米粉（金湖湾店）</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-cloud"></i> 下午</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>南宁园博园</div>
+                                    <div class="small-text">开车好玩，园子一般</div>
+                                    <div class="transport-info">
+                                        交通：打车
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-utensils"></i> 小吃</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>覃叔牛杂、卢姐粉饺、梁阿婆廿年老牌扣肉糯米饭</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-utensils"></i> 晚餐</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>邕味老友 <span class="rating">⭐⭐⭐⭐</span></div>
+                                    <div class="small-text">好吃，真的好吃！但是店里真的脏</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-ship"></i> 晚上</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>民生广场·水漾码头 邕江夜游</div>
+                                    <div class="small-text">emmm小孩很多很吵，水脏脏的，不太推荐</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-ice-cream"></i> 夜宵</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>夏梦金Summer King gelato <span class="rating">⭐⭐⭐⭐⭐</span></div>
+                                    <div class="small-text">尊嘟很推荐，每个口味都有广西的特色</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="day-card">
+                        <div class="day-header">Day 3 - 南宁文化</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-sun-o"></i> 上午</div>
+                                <div class="activity">
+                                    <i class="fa fa-museum"></i>
+                                    <div>广西壮族自治区博物馆 / 广西民族博物馆</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-utensils"></i> 午餐</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>808饭堂</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-train"></i> 下午</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>南宁 → 柳州</div>
+                                    <div class="small-text">高铁14:10-15:17</div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-hotel"></i>
+                                    <div>酒店：如家酒店neo（柳州五星步行街）</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- 柳州部分 -->
+                <div class="city-section">
+                    <h2>第二站：柳州</h2>
+                </div>
+                
+                <div class="itinerary">
+                    <div class="day-card">
+                        <div class="day-header">Day 3 - 柳州螺蛳粉测评</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-utensils"></i> 晚餐</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>螺蛳粉测评</div>
+                                    <div class="small-text">感觉得找犄角旮卡的其貌不扬的小店</div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-check"></i>
+                                    <div>香飘飘螺蛳粉：竟然是最好吃的一家</div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-times"></i>
+                                    <div>六品坊：no！</div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-minus"></i>
+                                    <div>何双螺蛳粉：一般</div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-minus"></i>
+                                    <div>快螺桃胶（炒螺蛳粉）：一般</div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-minus"></i>
+                                    <div>宝珠螺蛳粉：一般</div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-question"></i>
+                                    <div>西环肥仔螺蛳粉火车站店：没去吃</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-moon-o"></i> 晚上</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>五星美食街逛街</div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-coffee"></i>
+                                    <div>煲珠公奶茶 <span class="rating">⭐⭐⭐⭐</span></div>
+                                    <div class="small-text">点基础款珍珠奶茶，好喝的</div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-ice-cream"></i>
+                                    <div>卢姐炒冰 <span class="rating">⭐⭐⭐</span></div>
+                                    <div class="small-text">还行</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="day-card">
+                        <div class="day-header">Day 4 - 柳州探索</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-utensils"></i> 午餐</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>螺蛳粉</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-cloud"></i> 下午</div>
+                                <div class="activity">
+                                    <i class="fa fa-tree"></i>
+                                    <div>马鞍山公园</div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-tree"></i>
+                                    <div>蟠龙山公园</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-utensils"></i> 晚餐</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>铛牛佬牛杂火锅城</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-moon-o"></i> 晚上</div>
+                                <div class="activity">
+                                    <i class="fa fa-tree"></i>
+                                    <div>江滨公园散步</div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-music"></i>
+                                    <div>柳江大型音乐喷泉</div>
+                                    <div class="small-text">20:00-20:15 / 21:00-21:15</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="day-card">
+                        <div class="day-header">Day 5 - 柳州最后一天</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-utensils"></i> 午餐</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>螺蛳粉</div>
+                                    <div class="small-text">感觉柳州的螺蛳粉一般啊，没有老友粉好吃</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 桂林部分 -->
+                <div class="city-section">
+                    <h2>第三站：桂林</h2>
+                </div>
+                
+                <div class="itinerary">
+                    <div class="day-card">
+                        <div class="day-header">Day 5 - 抵达桂林</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-train"></i> 下午</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>柳州站 → 桂林站</div>
+                                    <div class="small-text">高铁</div>
+                                </div>
+                                <div class="activity">
+                                    <i class="fa fa-hotel"></i>
+                                    <div>酒店：维也纳酒店（桂林站两江四湖店）</div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-utensils"></i> 晚餐</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>明桂米粉</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="day-card">
+                        <div class="day-header">Day 6 - 返程</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-bus"></i> 上午</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>民航大厦坐大巴至桂林两江机场</div>
+                                    <div class="small-text">60-70分钟车程</div>
+                                    <div class="transport-info">
+                                        桂林市区机场巴士班次（桂林机场公众号可查询）：
+                                        民航大厦车次：06:00-08:00、17:00-22:00每小时一班
+                                        09:00-16:30每30分钟一班
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-plane"></i> 中午</div>
+                                <div class="activity">
+                                    <i class="fa fa-plane"></i>
+                                    <div>桂林两江机场 → 无锡硕放机场</div>
+                                    <div class="small-text">11:05-13:15</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+            </div>
+        </div>
+    </div>
+    
+    <!-- 第八页：最后一个攻略 -->
+    <div id="final-itinerary" class="page">
+        <div class="container">
+            <div class="travel-itinerary">
+                <div class="travel-header">
+                    <h2>衢州四日游旅行攻略</h2>
+                </div>
+                <div class="overview">
+                    <div class="card">
+                        <h3><i class="fa fa-train"></i> 交通信息</h3>
+                        <p><strong>出发地：</strong>无锡 → 衢州</p>
+                        <p><strong>交通方式：</strong>高铁 (3小时20分钟)</p>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fa fa-map-marked-alt"></i> 行程亮点</h3>
+                        <p><strong>主要景点：</strong>孔庙、江郎山</p>
+                    </div>
+                </div>
+                <h3 class="section-title">行程安排</h3>
+                <div class="itinerary">
+                    <div class="day-card">
+                        <div class="day-header">第一天 - 历史文化探索</div>
+                        <div class="day-content">
+                            <div class="time-slot">
+                                <div class="time"><i class="fa fa-sun-o"></i> 上午</div>
+                                <div class="activity">
+                                    <i class="fa fa-map-pin"></i>
+                                    <div>孔庙 <span class="pending">(待定)</span></div>
+                                </div>
+                                <div class="activity">
+                                  <i class="fa fa-map-pin"></i>
+                                  <div>衢州博物馆 (现场扫码预约)</div>
+                                </div>
+                                <div class="activity">
+                                  <i class="fa fa-map-pin"></i>
+                                  <div>儒学宫</div>
+                                </div>
+                                <div class="activity">
+                                  <i class="fa fa-map-pin"></i>
+                                  <div>府山公园 <span class="pending">(待定)</span></div>
+                                </div>
+                             </div>
+                             <div class="time-slot">
+                                <div class="time"><i class="fa fa-moon-o"></i> 晚上</div>
+                                <div class="activity">
+                                  <i class="fa fa-map-pin"></i>
+                                  <div>国金中心 <span class="pending">(待定)</span></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+          
+                          <div class="day-card">
+                            <div class="day-header">第二天 - 自然风光之旅</div>
+                            <div class="day-content">
+                              <div class="time-slot">
+                                <div class="time"><i class="fa fa-sun-o"></i> 上午 (10:00出发)</div>
+                                <div class="activity">
+                                  <i class="fa fa-bus"></i>
+                                  <div>衢州 → 江郎山 (公交1小时)</div>
+                                </div>
+                                <div class="activity">
+                                  <i class="fa fa-hiking"></i>
+                                  <div>江郎山 <span class="emoji">😊</span><span class="emoji">😴</span></div>
+                                </div>
+                              </div>
+                              <div class="time-slot">
+                                <div class="time"><i class="fa fa-cloud"></i> 下午</div>
+                                <div class="activity">
+                                  <i class="fa fa-map-pin"></i>
+                                  <div>廿八都 <span class="emoji">🍦</span></div>
+                                </div>
+                                <div class="activity">
+                                  <i class="fa fa-bus"></i>
+                                  <div>15:20 公交回衢州</div>
+                                </div>
+                              </div>
+                              <div class="time-slot">
+                                <div class="time"><i class="fa fa-moon-o"></i> 晚上</div>
+                                <div class="activity">
+                                  <i class="fa fa-map-pin"></i>
+                                  <div>水门亭历史文化街区 <span class="emoji">😌</span></div>
+                                </div>
+                                <div class="activity">
+                                  <i class="fa fa-ship"></i>
+                                  <div>信安湖夜游 (19:00) <span class="emoji">☺️</span></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+          
+                          <div class="day-card">
+                            <div class="day-header">第三天 - 山水与文化</div>
+                            <div class="day-content">
+                              <div class="time-slot">
+                                <div class="time"><i class="fa fa-sun-o"></i> 上午</div>
+                                <div class="activity">
+                                  <i class="fa fa-shopping-basket"></i>
+                                  <div>松原菜市场 <span class="pending">(待定)</span></div>
+                                </div>
+                              </div>
+                              <div class="time-slot">
+                                <div class="time"><i class="fa fa-cloud"></i> 下午</div>
+                                <div class="activity">
+                                  <i class="fa fa-bus"></i>
+                                  <div>衢州 → 药王山 (公交40分钟)</div>
+                                </div>
+                                <div class="activity">
+                                  <i class="fa fa-mountain"></i>
+                                  <div>药王山 <span class="emoji">😌</span></div>
+                                </div>
+                              </div>
+                              <div class="time-slot">
+                                <div class="time"><i class="fa fa-moon-o"></i> 晚上</div>
+                                <div class="activity">
+                                  <i class="fa fa-bed"></i>
+                                  <div>休息 <span class="emoji">😴</span></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+          
+                          <div class="day-card">
+                            <div class="day-header">第四天 - 美食与返程</div>
+                            <div class="day-content">
+                              <div class="time-slot">
+                                <div class="time"><i class="fa fa-sun-o"></i> 上午</div>
+                                <div class="activity">
+                                  <i class="fa fa-utensils"></i>
+                                  <div>美食探索 <span class="emoji">😴</span></div>
+                                </div>
+                              </div>
+                              <div class="time-slot">
+                                <div class="time"><i class="fa fa-train"></i> 中午</div>
+                                <div class="activity">
+                                  <i class="fa fa-train"></i>
+                                  <div>12:00 衢州 → 无锡 (高铁)</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div class="food-section">
+                          <h3 style="color: #2c3e50; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                            <i class="fa fa-utensils"></i> 衢州美食指南
+                          </h3>
+          
+                          <div class="food-grid">
+                            <div class="food-item">
+                              <div class="food-icon">
+                                <i class="fa fa-fire"></i>
+                              </div>
+                              <div>
+                                <h4>麻辣烫</h4>
+                                <p>衢州特色麻辣口味</p>
+                              </div>
+                            </div>
+            
+                            <div class="food-item">
+                              <div class="food-icon">
+                                <i class="fa fa-cookie"></i>
+                              </div>
+                              <div>
+                                <h4>喜多滋薄荷水晶糕</h4>
+                              </div>
+                            </div>
+            
+                            <div class="food-item">
+                              <div class="food-icon">
+                                <i class="fa fa-bread-slice"></i>
+                              </div>
+                              <div>
+                                <h4>董爸爸烤饼</h4>
+                                <p>马底站美食街</p>
+                              </div>
+                            </div>
+            
+                            <div class="food-item">
+                              <div class="food-icon">
+                                <i class="fa fa-egg"></i>
+                              </div>
+                              <div>
+                                <h4>素琴蛋卷</h4>
+                                <p>马底站美食街</p>
+                              </div>
+                            </div>
+            
+                            <div class="food-item">
+                              <div class="food-icon">
+                                <i class="fa fa-drumstick-bite"></i>
+                              </div>
+                              <div>
+                                <h4>鸭头</h4>
+                                <p>衢州特色小吃</p>
+                              </div>
+                            </div>
+            
+                            <div class="food-item">
+                              <div class="food-icon">
+                                <i class="fa fa-store"></i>
+                              </div>
+                              <div>
+                                <h4>小老汪饭店</h4>
+                                <p>当地知名餐厅</p>
+                              </div>
+                            </div>
+            
+                            <div class="food-item">
+                              <div class="food-icon">
+                                <i class="fa fa-shopping-basket"></i>
+                              </div>
+                              <div>
+                                <h4>松园菜场美食</h4>
+                                <p>搁袋饼、鸡蛋粿、粽子</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div class="card">
+                          <h3><i class="fa fa-map"></i> 备选景点</h3>
+                          <div class="activity">
+                            <i class="fa fa-monument"></i>
+                            <div>龙游石窟 - 古代地下建筑群奇观</div>
+                          </div>
+                          <div class="activity">
+                            <i class="fa fa-lake"></i>
+                            <div>仙霞湖 - 风景如画的水上景区</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+                
+
+    <!-- 信封容器 -->
+    <div class="envelope-container hidden" id="envelopeContainer">
+        <div class="envelope" id="envelope">
+            <div class="envelope-text">点击查看攻略</div>
+        </div>
+    </div>
+
+    <script>
+        // 目的地数据
+        const destinations = {
+            xuzhou: {
+                name: '徐州',
+                description: '探索历史古城，品味地道美食，体验徐州独特魅力',
+                title: '徐州三日游旅行攻略',
+                icon: '🏯'
+            },
+            henan: {
+                name: '河南',
+                description: '探索中原文明，感受历史文化，品味地道美食',
+                title: '河南九日游旅行攻略',
+                icon: '🐉'
+            },
+            quzhou: {
+                name: '衢州',
+                description: '探索江南古城，品味地道美食',
+                title: '衢州四日游旅行攻略',
+                icon: '🌶️'
+            },
+            guangxi: {
+                name: '广西',
+                description: '探索山水甲天下，品味地道美食，感受少数民族文化',
+                title: '广西六日游旅行攻略',
+                icon: '🏞️'
+            }
+        };
+
+        // 季节推荐映射
+        const seasonRecommendations = {
+            spring: 'xuzhou',
+            summer: 'guangxi',
+            autumn: 'xuzhou',
+            winter: 'henan'
+        };
+
+        // 转盘颜色
+        const wheelColors = ['#ff6b6b', '#4ecdc4', '#45b7d1'];
+
+        let selectedDestinations = [];
+        let availableDestinations = ['xuzhou', 'henan', 'quzhou', 'guangxi'];
+        let currentStage = 0;
+        let isTransitioning = false;
+
+        // 显示加载遮罩 - 优化版本
+        function showLoading() {
+            if (!isTransitioning) {
+                isTransitioning = true;
+                // 只在确实需要长时间加载的操作中显示加载遮罩
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                if (loadingOverlay) {
+                    loadingOverlay.classList.add('active');
+                }
+            }
+        }
+
+        // 隐藏加载遮罩 - 优化版本
+        function hideLoading() {
+            // 减少延迟时间，提高响应速度
+            setTimeout(() => {
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                if (loadingOverlay) {
+                    loadingOverlay.classList.remove('active');
+                }
+                isTransitioning = false;
+            }, 100);
+        }
+
+        // 第一页：礼物拆开
+        document.addEventListener('DOMContentLoaded', () => {
+            const page1 = document.getElementById('page1');
+            const page2 = document.getElementById('page2');
+            const ribbon = document.getElementById('ribbon');
+            const giftLid = document.getElementById('giftLid');
+            const lightEffect = document.getElementById('lightEffect');
+            
+            let isPulling = false;
+            let pullStartTime = 0;
+            
+            ribbon.addEventListener('mouseenter', function() {
+                if (!isPulling) {
+                    this.style.transform = 'translateX(-50%) scale(1.05)';
+                    document.body.style.cursor = 'pointer';
+                }
+            });
+            
+            ribbon.addEventListener('mouseleave', function() {
+                if (!isPulling) {
+                    this.style.transform = 'translateX(-50%) scale(1)';
+                    document.body.style.cursor = 'default';
+                }
+            });
+            
+            ribbon.addEventListener('mousedown', function() {
+                isPulling = true;
+                pullStartTime = Date.now();
+                this.style.animation = 'pull-ribbon 0.5s forwards';
+                document.body.style.cursor = 'grabbing';
+            });
+            
+            document.addEventListener('mouseup', function() {
+                if (isPulling) {
+                    const pullDuration = Date.now() - pullStartTime;
+                    if (pullDuration > 300) {
+                        ribbon.style.animation = 'remove-ribbon 0.5s forwards';
+                        setTimeout(() => {
+                            giftLid.style.animation = 'open-lid 1s forwards';
+                            setTimeout(() => {
+                                lightEffect.style.opacity = '1';
+                                setTimeout(() => {
+                                    page1.classList.remove('active');
+                                    page2.classList.add('active');
+                                    console.log('切换到季节选择页面 (page2)');
+                                    // 移除自动滚动到顶部的代码
+                                    // 移除不必要的加载遮罩调用
+                                }, 1000);
+                            }, 500);
+                        }, 500);
+                    } else {
+                        isPulling = false;
+                        ribbon.style.animation = 'none';
+                        setTimeout(() => {
+                            ribbon.style.transform = 'translateX(-50%) scale(1)';
+                            document.body.style.cursor = 'pointer';
+                        }, 10);
+                    }
+                }
+            });
+
+            // 季节选择
+            document.querySelectorAll('.season-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    if (isTransitioning) return;
+                    const season = this.dataset.season;
+                    const destination = seasonRecommendations[season];
+                    
+                    console.log('点击的季节:', season, '目的地:', destination);
+                    if (destination) {
+                        selectDestination(destination, 1);
+                        showEnvelope(destination, 'season-itinerary');
+                    } else {
+                        console.error('未找到对应季节的目的地:', season);
+                        alert('无法找到对应目的地的攻略，请选择其他季节！');
+                    }
+                });
+            });
+
+            // 返回按钮
+            document.getElementById('backFromSeason').addEventListener('click', () => {
+                if (isTransitioning) return;
+                document.getElementById('season-itinerary').classList.remove('active');
+                setupWheel();
+                document.getElementById('page4').classList.add('active');
+                currentStage = 2;
+                console.log('切换到转盘页面 (page4)');
+                // 移除自动滚动到顶部的代码
+                // 移除不必要的加载遮罩调用
+            });
+
+            document.getElementById('backFromWheel').addEventListener('click', () => {
+                if (isTransitioning) return;
+                document.getElementById('wheel-itinerary').classList.remove('active');
+                setupCards();
+                document.getElementById('page6').classList.add('active');
+                currentStage = 3;
+                console.log('切换到卡片页面 (page6)');
+                // 移除自动滚动到顶部的代码
+                // 移除不必要的加载遮罩调用
+            });
+
+            document.getElementById('finalButton').addEventListener('click', () => {
+                if (isTransitioning) return;
+                document.getElementById('card-itinerary').classList.remove('active');
+                const lastDestination = availableDestinations[0];
+                showItinerary(lastDestination, 'final-itinerary');
+                currentStage = 4;
+                console.log('切换到最终攻略页面 (final-itinerary)');
+                // 移除自动滚动到顶部的代码
+                // 移除不必要的加载遮罩调用
+            });
+        });
+
+        // 显示信封
+        function showEnvelope(destination, targetPage) {
+            const envelopeContainer = document.getElementById('envelopeContainer');
+            if (!envelopeContainer) {
+                console.error('未找到信封容器');
+                return;
+            }
+            
+            console.log('显示信封，目的地:', destination, '目标页面:', targetPage);
+            envelopeContainer.classList.remove('hidden');
+            envelopeContainer.classList.add('visible');
+            envelopeContainer.style.animation = 'envelope-appear 0.8s ease forwards';
+            
+            const envelope = document.getElementById('envelope');
+            if (!envelope) {
+                console.error('未找到信封元素');
+                return;
+            }
+            
+            envelope.onclick = null;
+            envelope.onclick = function() {
+                if (isTransitioning) return;
+                console.log('点击信封，显示攻略:', destination, '页面:', targetPage);
+                showItinerary(destination, targetPage);
+                envelopeContainer.classList.remove('visible');
+                envelopeContainer.classList.add('hidden');
+                // 移除不必要的加载遮罩调用
+            };
+        }
+
+        // 显示旅行攻略
+        function showItinerary(destination, pageId) {
+            console.log('尝试显示攻略页面:', pageId, '目的地:', destination);
+            
+            document.querySelectorAll('.page').forEach(page => {
+                if (page.classList.contains('active')) {
+                    page.classList.remove('active');
+                    console.log('隐藏页面:', page.id);
+                }
+            });
+            
+            const itineraryPage = document.getElementById(pageId);
+            if (itineraryPage) {
+                setTimeout(() => {
+                    itineraryPage.classList.add('active');
+                    console.log('显示攻略页面:', pageId);
+                    // 移除自动滚动到顶部的代码，避免页面跳转问题
+                    
+                    const titleElement = document.getElementById(`${pageId}Title`);
+                    const descriptionElement = document.getElementById(`${pageId}Description`);
+                    const contentElement = document.getElementById(`${pageId}Content`);
+                    
+                    if (titleElement && descriptionElement && contentElement) {
+                        titleElement.textContent = destinations[destination].title;
+                        descriptionElement.textContent = destinations[destination].description;
+                        console.log('更新攻略内容:', destinations[destination].name);
+                    } else {
+                        console.error('未找到攻略页面元素:', pageId);
+                    }
+                    
+                    setTimeout(() => {
+                        if (itineraryPage.classList.contains('active')) {
+                            console.log('确认页面显示:', pageId);
+                        } else {
+                            console.error('页面未显示:', pageId);
+                            document.querySelectorAll('.page').forEach(page => {
+                                if (page.classList.contains('active')) {
+                                    console.log('当前显示页面:', page.id);
+                                }
+                            });
+                        }
+                    }, 1000);
+                }, 100);
+            } else {
+                console.error('未找到攻略页面:', pageId);
+            }
+        }
+
+        // 设置转盘
+        function setupWheel() {
+            const wheel = document.getElementById('wheel_image');
+            wheel.style.transform = 'rotate(0deg)';
+            
+            // 指针现在位于wheel-wrapper中，不需要动态创建
+            
+            console.log('转盘已设置，使用背景图片模式，指针固定在外部');
+            
+            document.getElementById('spinButton').onclick = spinWheel;
+        }
+
+        // 转盘旋转
+        function spinWheel() {
+            if (isTransitioning) return;
+            showLoading();
+            const wheel = document.getElementById('wheel_image');
+            const spinButton = document.getElementById('spinButton');
+            
+            spinButton.disabled = true;
+            
+            // 适配SVG图片中的三个区域，每个120度，并考虑SVG中区域的实际位置
+            const segmentAngle = 360 / 3;
+            const extraSpins = 5;
+            const randomSegment = Math.floor(Math.random() * 3);
+            
+            // 调整目标角度以匹配SVG图片中的区域位置，考虑到SVG中的区域分布
+            // 假设SVG中区域按照顺时针顺序：0:广西(蓝色), 1:河南(橙色), 2:衢州(绿色)
+            // 添加-60度的偏移以确保指针指向区域中心
+            const targetAngle = 360 * extraSpins + (randomSegment * segmentAngle) - 60;
+            
+            wheel.style.transition = 'transform 3s cubic-bezier(0.2, 0.8, 0.3, 1)';
+            wheel.style.transform = `rotate(${-targetAngle}deg)`;
+            
+            setTimeout(() => {
+                // 三个目的地，对应SVG图片上的三个区域
+                const threeDestinations = ['guangxi', 'henan', 'quzhou'];
+                const selectedDest = threeDestinations[randomSegment];
+                selectDestination(selectedDest, 2);
+                
+                setTimeout(() => {
+                    showEnvelope(selectedDest, 'wheel-itinerary');
+                    spinButton.disabled = false;
+                    hideLoading();
+                }, 500);
+            }, 3000);
+        }
+
+        // 设置卡片
+        function setupCards() {
+            const memoryCards = document.getElementById('memoryCards');
+            memoryCards.innerHTML = '';
+            
+            const shuffledDestinations = [...availableDestinations].sort(() => Math.random() - 0.5).slice(0, 2);
+            
+            shuffledDestinations.forEach(dest => {
+                const card = document.createElement('div');
+                card.className = 'travel-card';
+                card.dataset.destination = dest;
+                
+                card.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div style="font-size: 3rem;">🧐</div>
+                        </div>
+                        <div class="card-back">
+                            <div style="font-size: 3rem;">${destinations[dest].icon}</div>
+                            <button>点击查看</button>
+                        </div>
+                    </div>
+                `;
+                
+                card.addEventListener('click', function() {
+                    if (isTransitioning || this.classList.contains('flipped')) return;
+                    this.classList.add('flipped');
+                    const selectedDest = this.dataset.destination;
+                    selectDestination(selectedDest, 3);
+                    
+                    setTimeout(() => {
+                        const viewButton = card.querySelector('.card-back button');
+                        viewButton.onclick = () => {
+                                if (isTransitioning) return;
+                                // 移除不必要的加载遮罩调用
+                                showItinerary(selectedDest, 'card-itinerary');
+                            };
+                    }, 800);
+                });
+                
+                memoryCards.appendChild(card);
+            });
+        }
+
+        // 选择目的地
+        function selectDestination(destination, stage) {
+            selectedDestinations[stage - 1] = destination;
+            
+            const index = availableDestinations.indexOf(destination);
+            if (index > -1) {
+                availableDestinations.splice(index, 1);
+            }
+            
+            currentStage = stage;
+            console.log('选择目的地:', destination, '当前阶段:', currentStage);
+        }
+    </script>
+</body>
+</html>
